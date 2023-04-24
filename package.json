@@ -7,9 +7,16 @@
     "build": "nx build",
     "test": "nx test"
   },
+  "main": "dist/apps/functions/main.js",
+  "engines": {
+    "node": "18"
+  },
   "private": true,
   "dependencies": {
+    "antd": "^5.1.0",
     "core-js": "^3.6.5",
+    "firebase-admin": "^10.2.0",
+    "firebase-functions": "^3.21.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "regenerator-runtime": "0.13.7",
@@ -21,6 +28,7 @@
     "@nrwl/eslint-plugin-nx": "15.3.3",
     "@nrwl/jest": "15.3.3",
     "@nrwl/linter": "15.3.3",
+    "@nrwl/node": "15.3.3",
     "@nrwl/react": "15.3.3",
     "@nrwl/web": "15.3.3",
     "@nrwl/workspace": "15.3.3",
@@ -28,7 +36,7 @@
     "@svgr/webpack": "^6.1.2",
     "@testing-library/react": "13.4.0",
     "@types/jest": "28.1.1",
-    "@types/node": "16.11.7",
+    "@types/node": "18.7.1",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.9",
     "@typescript-eslint/eslint-plugin": "^5.36.1",
