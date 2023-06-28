@@ -4,7 +4,15 @@ import * as firebase from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { useSignOut, useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import * as React from "react";
+import * as React from 'react';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Button from '@mui/material/Button';
+import { Grid } from '@mui/material';
+import { useState } from 'react';
+import dayjs from 'dayjs'
+import { getFirestore, addDoc, collection } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBzwfrmAx8unwKnGq7DBzu0PD2qlvxcExs',
@@ -17,6 +25,7 @@ const firebaseConfig = {
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 const firebaseAppAuth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
 const HomePage = () => {
   const [signOut] = useSignOut(firebaseAppAuth);
@@ -49,17 +58,69 @@ const HomePage = () => {
   return <button onClick={() => signInWithGoogle()}>Log in</button>;
 };
 
+type Edition = {
+  label: string;
+  partenershipStartDate: Date;
+  cfpStartDate: Date;
+  cfpEndDate: Date;
+  installDate: Date;
+  startDate: Date;
+  endDate: Date;
+}
+
+const CreateEdition = () => {
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+
+  const onSubmitHandler = (e: React.FormEvent) => {
+    e.preventDefault();
+    const edition: Edition = {
+      label: `Devfest Lille ${startDate?.getFullYear()}`,
+      partenershipStartDate: new Date(startDate!.getFullYear(), 0, 1),
+      cfpStartDate: new Date(startDate!.getFullYear(), 0, 1),
+      cfpEndDate: new Date(startDate!.getFullYear(), 2, 31),
+      installDate: dayjs(startDate).subtract(1).toDate(),
+      startDate: startDate!,
+      endDate: endDate!
+    }
+    addDoc(collection(db, 'editions'), edition)
+  };
+  return (
+    <>
+      <h1> Créer une nouvelle édition du Devfest Lille </h1>
+      <form onSubmit={onSubmitHandler}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <DatePicker label="Date de Début" onChange={(value: any) => setStartDate(value.toDate())}/>
+            <DatePicker label="Date de Fin" onChange={(value: any) => setEndDate(value.toDate())}/>
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained" type="submit">
+              Créer
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
+    </>
+  );
+};
 const router = createBrowserRouter([
   {
     path: '/',
     element: <HomePage></HomePage>,
+  },
+  {
+    path: '/admin/create',
+    element: <CreateEdition></CreateEdition>,
   },
 ]);
 
 const App = () => {
   return (
     <React.StrictMode>
-      <RouterProvider router={router} />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <RouterProvider router={router} />
+      </LocalizationProvider>
     </React.StrictMode>
   );
 };
